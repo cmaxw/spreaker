@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    spreaker (0.1.0)
+    spreaker (0.1.1)
       faraday (~> 2.7.11)
 
 GEM
