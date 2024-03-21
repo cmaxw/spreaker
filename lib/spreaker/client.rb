@@ -50,8 +50,8 @@ module Spreaker
       response = connection.post("/v2/episodes/#{id}") do |req|
         req.body = URI.encode_www_form(properties)
       end
-      properties = JSON.parse(response.body)
-      Spreaker::Episode.new(properties: JSON.parse(response.body)["response"]["episode"])
+      properties = JSON.parse(response.body)['response']['episode']
+      Spreaker::Episode.new(properties: properties)
     end
   end
 end
