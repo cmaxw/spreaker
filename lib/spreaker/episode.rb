@@ -2,7 +2,7 @@ module Spreaker
   class Episode
     attr_reader :properties
 
-    def intialize(properties:)
+    def initialize(properties:)
       @properties = properties
     end
 
