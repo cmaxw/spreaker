@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "faraday"
+require "faraday/retry"
 require_relative "spreaker/version"
 require_relative "spreaker/user"
 require_relative "spreaker/show"

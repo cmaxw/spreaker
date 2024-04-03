@@ -4,7 +4,15 @@ module Spreaker
 
     def initialize(access_token: ENV["SPREAKER_ACCESS_TOKEN"])
       @access_token = access_token
+      retry_options = {
+        max: 2,
+        interval: 0.05,
+        interval_randomness: 0.5,
+        backoff_factor: 2,
+        retry_statuses: [429]
+      }
       @connection = Faraday.new(url: "https://api.spreaker.com") do |conn|
+        conn.request :retry, retry_options
         conn.request :authorization, "Bearer", @access_token
       end
     end
@@ -56,16 +64,11 @@ module Spreaker
     end
 
     def update_episode(id:, properties:)
-      begin
-        response = connection.post("/v2/episodes/#{id}") do |req|
-          req.body = URI.encode_www_form(properties)
-        end
-        properties = JSON.parse(response.body)['response']['episode']
-        Spreaker::Episode.new(properties: properties)
-      rescue JSON::ParserError => e
-        ap response.body
-        raise e
+      response = connection.post("/v2/episodes/#{id}") do |req|
+        req.body = URI.encode_www_form(properties)
       end
+      properties = JSON.parse(response.body)['response']['episode']
+      Spreaker::Episode.new(properties: properties)
     end
   end
 end
