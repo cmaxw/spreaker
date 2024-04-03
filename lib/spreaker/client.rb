@@ -41,9 +41,18 @@ module Spreaker
 
     def episodes(show:)
       response = connection.get("/v2/shows/#{show.id}/episodes").body
-      JSON.parse(response)["response"]["items"].map do |episode|
-        Spreaker::Show.new(properties: episode)
+      response_hash = JSON.parse(response)
+      episode_list = response_hash["response"]["items"].map do |episode|
+        Spreaker::Episode.new(properties: episode)
       end
+      while(response_hash.dig("response", "next_url").present? && response_hash["response"]["items"].any?)
+        response = connection.get(response_hash["response"]["next_url"]).body
+        response_hash = JSON.parse(response)
+        episode_list += response_hash["response"]["items"].map do |episode|
+          Spreaker::Episode.new(properties: episode)
+        end
+      end
+      episode_list
     end
 
     def update_episode(id:, properties:)
