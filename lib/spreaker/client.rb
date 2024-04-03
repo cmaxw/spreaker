@@ -56,11 +56,16 @@ module Spreaker
     end
 
     def update_episode(id:, properties:)
-      response = connection.post("/v2/episodes/#{id}") do |req|
-        req.body = URI.encode_www_form(properties)
+      begin
+        response = connection.post("/v2/episodes/#{id}") do |req|
+          req.body = URI.encode_www_form(properties)
+        end
+        properties = JSON.parse(response.body)['response']['episode']
+        Spreaker::Episode.new(properties: properties)
+      rescue JSON::ParserError => e
+        ap response.body
+        raise e
       end
-      properties = JSON.parse(response.body)['response']['episode']
-      Spreaker::Episode.new(properties: properties)
     end
   end
 end
